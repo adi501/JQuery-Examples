@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/jquery-3.6.0.js"></script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td><strong>Int value:</strong></td>
+        <td>
+          <input type="text" name="numeric" class="allow_numeric" />
+          <div>It will Allow only numeric values</div>
+        </td>
+      </tr>
+    </table>
+    <script>
+      $(document).ready(function () {
+        $(".allow_numeric").on("input", function (evt) {
+          var self = $(this);
+          self.val(self.val().replace(/\D/g, ""));
+          if (evt.which < 48 || evt.which > 57) {
+            evt.preventDefault();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
