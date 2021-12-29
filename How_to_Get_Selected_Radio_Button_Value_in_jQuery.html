@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/jquery-3.6.0.js"></script>
+  </head>
+  <body>
+    <input type="radio" name="StuName" class="clsStu" value="adi" /> Adi
+    <input type="radio" name="StuName" class="clsStu" value="pavan" /> Pavan
+    <input type="radio" name="StuName" class="clsStu" value="madhan" /> Madhan
+    <input type="radio" name="StuName" class="clsStu" value="nani" /> Nani
+    <input type="radio" name="StuName" class="clsStu" value="balu" /> Balu
+    <button>Get Value</button>
+    <script type="text/javascript">
+      $("button").click(function () {
+        var val = $(".clsStu:checked").val();
+        alert(val);
+      });
+    </script>
+  </body>
+</html>
