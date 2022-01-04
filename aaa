@@ -1,0 +1,92 @@
+  public static IBBTradeRoot GetIBBInfo(string regNumber)
+        {
+            string AccessToken = GetIbbProcurementDetailsToken();
+            string dealer_code = HttpContext.Current.Session["DEALER_CODE"].ToString();
+            // System.Web.SessionState.
+            string data = string.Empty;
+            var BaseUrl = "http://cpt.stageibb.com/cpt_thirdparty_apis/public/ibb_oms/fetchProcurementDetails";
+
+
+            data = "{'dealer_code':'" + dealer_code + "','registration_number':'" + regNumber + "','access_token':'" + AccessToken + "'}";
+
+
+            data = data.Replace("'", "\"");
+            var content = new StringContent(data.ToString(), Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(BaseUrl);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var response = client.PostAsync(BaseUrl, content).Result;
+                string JsonResult = response.Content.ReadAsStringAsync().Result;
+                var content1 = JsonResult;
+                var jsonResult = JsonConvert.DeserializeObject(content1).ToString();
+                var ApiResponse = JsonConvert.DeserializeObject<IBBTradeRoot>(jsonResult);
+
+                IBBTradeRoot objIBBTradeRoot = JsonConvert.DeserializeObject<IBBTradeRoot>(jsonResult);
+
+                if (objIBBTradeRoot.status_code == 500)
+                {
+                    objIBBTradeRoot.IbbStatus = "nodata";
+                    return objIBBTradeRoot;
+                }
+                else
+                {
+
+                    string make = objIBBTradeRoot.procurement_details.make;
+                    string model = objIBBTradeRoot.procurement_details.model;
+
+                    var _db1 = new MahindraFirstChoiceDataClassesDataContext();
+                    var dealerdata = _db1.tb_mfc_ibb_mmv_mappings.FirstOrDefault(x => x.Ibb_Make == objIBBTradeRoot.procurement_details.make
+                    && x.Ibb_Model == objIBBTradeRoot.procurement_details.model && x.Ibb_Variant == objIBBTradeRoot.procurement_details.variant);
+
+                    //  string aa= dealerdata.
+                    if (dealerdata != null)
+                    {
+                        objIBBTradeRoot.procurement_details.make = dealerdata.make;
+                        objIBBTradeRoot.procurement_details.model = dealerdata.model;
+                        objIBBTradeRoot.procurement_details.variant = dealerdata.variant;
+                        objIBBTradeRoot.procurement_details.modelId = dealerdata.IBB_Model_ID;
+
+
+                        objIBBTradeRoot.IbbStatus = "success";
+                        return objIBBTradeRoot;
+                    }
+                    else
+                    {
+                        objIBBTradeRoot.IbbStatus = "datanotmapped";
+                        // mail code
+                        return objIBBTradeRoot;
+                    }
+                }
+            }
+
+
+        }
+        public static string GetIbbProcurementDetailsToken()
+        {
+            try
+            {
+                var UserName = "ibb_oms";
+                var Password = "ibb_oms";
+                string IbbTokenUrl = "http://cpt.stageibb.com/cpt_thirdparty_apis/public/ibb_oms/generateaccesstoken";
+                string data = "{'username':'" + UserName + "','password':'" + Password + "'}";
+                data = data.Replace("'", "\"");
+                var content = new StringContent(data.ToString(), Encoding.UTF8, "application/json");
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(IbbTokenUrl);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    var response = client.PostAsync(IbbTokenUrl, content).Result;
+                    string JsonResult = response.Content.ReadAsStringAsync().Result;
+                    var Response = (JObject)JsonConvert.DeserializeObject(JsonResult);
+                    string token = Response["access_token"].Value<string>();
+                    return token;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
