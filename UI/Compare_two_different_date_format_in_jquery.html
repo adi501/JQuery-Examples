@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/jquery-3.6.0.js"></script>
+    <script>
+      $(document).ready(function () {
+        var x =  new Date();
+        var Date_y = "13-02-2024";
+        split_y = Date_y.split('-');
+        var y = new Date(split_y[2]+'-'+split_y[1]+'-'+split_y[0]);  
+        if(new Date(x) <= new Date(y))
+        {
+            alert('y');
+        }
+        else{
+            alert('x');
+        }
+      });
+    </script>
+  </head>
+  <body></body>
+</html>

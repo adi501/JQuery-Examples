@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/jquery-3.6.0.js"></script>
+  </head>
+  <body>
+    <div class="div1">
+      div 1
+    </div>
+    <div>div 2</div>
+    <button>Check div1 Class exist or not</button>
+    <script type="text/javascript">
+      $("button").click(function () {
+        var div1Class = $("div").hasClass("div1");
+        alert(div1Class);
+      });
+    </script>
+  </body>
+</html>
